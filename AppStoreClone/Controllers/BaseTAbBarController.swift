@@ -6,21 +6,23 @@
 //
 
 import UIKit
+import LocalAuthentication
 
 class baseTabBarController: UITabBarController {
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
         viewControllers = [
-            createNavController(viewController: AppStoreSearchController(), title: "Search", image: "search"),
+            createNavController(viewController: AppsController(), title: "Apps", image: "apps"),
             createNavController(viewController: UIViewController(), title: "Today", image: "today_icon"),
-            createNavController(viewController: UIViewController(), title: "Apps", image: "apps"),
+            createNavController(viewController: AppStoreSearchController(), title: "Search", image: "search")
             
         ]
         
         
     }
+    
     
     
     fileprivate func createNavController(viewController:UIViewController,title:String,image:String) -> UIViewController {

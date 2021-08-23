@@ -9,19 +9,27 @@ import UIKit
 import SDWebImage
 
 
-class AppStoreSearchController: UICollectionViewController,UICollectionViewDelegateFlowLayout {
+class AppStoreSearchController: BaseListController,UICollectionViewDelegateFlowLayout, UISearchBarDelegate {
     
     let searchController = UISearchController(searchResultsController: nil)
     
     fileprivate let cellId = "1234"
     
+   fileprivate let enterSearchTermLabel: UILabel =  {
+        
+        let label = UILabel()
+        label.text = "Please enter a search term..."
+        label.textAlignment = .center
+        label.font = UIFont.boldSystemFont(ofSize: 20)
+        return label
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.backgroundColor = .white
-        
         collectionView.register(SearchResultCell .self, forCellWithReuseIdentifier: cellId)
-        
-        fetchItunesApps()
+        collectionView.addSubview(enterSearchTermLabel)
+        enterSearchTermLabel.fillSuperview(padding: .init(top: 100, left: 50, bottom: 0, right: 50))
         setupSearchBar()
     }
     
@@ -30,27 +38,29 @@ class AppStoreSearchController: UICollectionViewController,UICollectionViewDeleg
         navigationItem.searchController = self.searchController
         navigationItem.hidesSearchBarWhenScrolling = false
         searchController.obscuresBackgroundDuringPresentation = false
-
+        searchController.searchBar.delegate = self
     }
     
     fileprivate var appResults = [Result]()
+    var timer:Timer?
     
-    func fetchItunesApps() {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        timer?.invalidate()
         
-        Service.shared.fetchApps { result, err in
-            
-            if let err = err {
-                print("Failed to fetch apps",err)
-                return
+        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { _ in
+            Service.shared.fetchApps(searchTerm: searchText) { result, err in
+                if let err = err {
+                    print("Failed to fetch apps",err)
+                    return
+                }
+                
+                self.appResults = result
+                
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
+                }
             }
-            
-            self.appResults = result
-            
-            DispatchQueue.main.async {
-                self.collectionView.reloadData()
-            }
-        }
-        
+        })
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -64,6 +74,7 @@ class AppStoreSearchController: UICollectionViewController,UICollectionViewDeleg
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        enterSearchTermLabel.isHidden = appResults.count != 0
         return appResults.count
     }
     
@@ -72,11 +83,4 @@ class AppStoreSearchController: UICollectionViewController,UICollectionViewDeleg
         return CGSize(width: view.frame.width, height: 350)
     }
     
-    init() {
-        super.init(collectionViewLayout: UICollectionViewFlowLayout())
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
 }
