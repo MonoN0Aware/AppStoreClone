@@ -14,7 +14,7 @@ class baseTabBarController: UITabBarController {
         super.viewDidLoad()
         
         viewControllers = [
-            createNavController(viewController: AppsController(), title: "Apps", image: "apps"),
+            createNavController(viewController: AppsPageController(), title: "Apps", image: "apps"),
             createNavController(viewController: UIViewController(), title: "Today", image: "today_icon"),
             createNavController(viewController: AppStoreSearchController(), title: "Search", image: "search")
             
@@ -25,7 +25,7 @@ class baseTabBarController: UITabBarController {
     
     
     
-    fileprivate func createNavController(viewController:UIViewController,title:String,image:String) -> UIViewController {
+fileprivate func createNavController(viewController:UIViewController,title:String,image:String) -> UIViewController {
         
         let navController = UINavigationController(rootViewController: viewController)
         viewController.navigationItem.title = title

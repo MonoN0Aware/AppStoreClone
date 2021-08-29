@@ -11,7 +11,7 @@ class BaseListController: UICollectionViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        collectionView.backgroundColor = .blue
+        collectionView.backgroundColor = .white
     }
     
     init() {
